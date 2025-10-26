@@ -103,8 +103,6 @@ document.addEventListener("DOMContentLoaded", () => {
     livrablesList.innerHTML = "";
     (llmData.livrables || []).forEach(l => {
       const li = document.createElement("li");
-
-      // Checkbox
       const cb = document.createElement("input");
       cb.type = "checkbox";
       cb.dataset.titre = l.titre;
@@ -112,7 +110,6 @@ document.addEventListener("DOMContentLoaded", () => {
       li.appendChild(cb);
       li.appendChild(document.createTextNode(` ${l.titre} (${l.type})`));
 
-      // Notes
       const note = document.createElement("textarea");
       note.className = "livrable-note";
       note.placeholder = "Ajouter une note ou commentaire...";
@@ -151,13 +148,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const content = selected.map(m => `À: ${m.destinataire}\nSujet: ${m.sujet}\nMessage: ${m.texte}`).join("\n\n");
     navigator.clipboard.writeText(`${promptTexte}\n\n${content}`)
       .then(() => alert("Prompt + messages copiés dans le presse-papiers !"));
-    window.open("https://chat.openai.com/", "_blank");
+    const newWindow = window.open("https://chat.openai.com/", "_blank");
+    if(newWindow) newWindow.focus();
   });
 
-  // Générer livrables via LLM (avec notes)
+  // Générer livrables
   generateLivrableBtn.addEventListener("click", () => {
     if (!llmData?.livrables) return;
-    const selected = Array.from(livrablesList.querySelectorAll("li")).filter(li => li.querySelector("input[type=checkbox]").checked);
+    const selected = Array.from(livrablesList.querySelectorAll("li"))
+      .filter(li => li.querySelector("input[type=checkbox]").checked);
     if (!selected.length) { alert("Coche au moins un livrable !"); return; }
     const promptTexte = livrablePrompts[livrablePromptSelect.value];
     const content = selected.map(li => {
@@ -167,6 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }).join("\n\n");
     navigator.clipboard.writeText(`${promptTexte}\n\n${content}`)
       .then(() => alert("Prompt + livrables copiés dans le presse-papiers !"));
-    window.open("https://chat.openai.com/", "_blank");
+    const newWindow = window.open("https://chat.openai.com/", "_blank");
+    if(newWindow) newWindow.focus();
   });
 });
